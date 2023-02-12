@@ -38,11 +38,31 @@ tPosL previous(tPosL p, tList L){
 }
 
 bool insertItem(tItemL d, tPosL p, tList *L){
+    tPosL i;
 
+    if(L->lastPos == MAX - 1){
+        return false;
+    }else{
+        L->lastPos++;
+        if(p == LNULL){
+            tPosL q = L->lastPos;
+            L->data[q] = d;
+        }else{
+            for(i = L->lastPos; i >= p+1; i--){
+                L->data[i] = L->data[i - 1];
+            }
+            L->data[p] = d;
+        }
+        return true;
+    }
 }
 
 void deleteAtPosition(tPosL p, tList *L){
-
+    tPosL i;
+    L -> lastPos --;
+    for(i = p; i <= L->lastPos; i++){
+        L->data[i] = L->data[i + 1];
+    }
 }
 
 tItemL getItem(tPosL p, tList L){
@@ -54,5 +74,14 @@ void updateItem(tItemL d, tPosL p, tList *L){
 }
 
 tPosL findItem(tParticipantName d, tList L){
-
+    if(isEmptyList(L)) {return LNULL;}
+    else{
+        tPosL i;
+        for(i = 0; (i < L.lastPos) && (strcmp(L.data[i].participantName, d) != 0); i++);
+        if(strcmp(L.data[i].participantName, d) != 0){
+            return LNULL;
+        }else{
+            return i;
+        }
+    }
 }
