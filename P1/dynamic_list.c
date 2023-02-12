@@ -95,12 +95,12 @@ tItemL getItem(tPosL p, tList L){       //Devuelve el elemento correspondiente a
 void updateItem(tItemL d, tPosL p, tList * L){      //Modifica el contenido de un elemento de la lista
     p->data = d;
 }
-tPosL findItem(tProductId i, tList L) {              //Encuentra el primer elemento con cierto contenido en la lista.
+tPosL findItem(tParticipantName i, tList L) {              //Encuentra el primer elemento con cierto contenido en la lista.
     tPosL q;
     if (isEmptyList(L))
         q = LNULL;
     else {
-        for (q = L;(q != LNULL) && (strcmp(q->data.productId,i) != 0);q = q->next);
+        for (q = L;(q != LNULL) && (strcmp(q->data.participantName,i) != 0);q = q->next);
     }
     return q;
 }
