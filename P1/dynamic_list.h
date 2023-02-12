@@ -11,7 +11,37 @@
 #define DYNAMIC_LIST_H
 
 #include "types.h"
+#include <stdbool.h>
+#include <string.h>
+#include <malloc.h>
+#include <stdlib.h>
+#include <stdio.h>
+#define LNULL NULL
 
-/* Write your code here... */
+typedef struct Node* tPosL;
+struct Node{
+    tItemL data;
+    tPosL next;
+};
+typedef tPosL tList;
+
+//GENERADORAS
+void createEmptyList(tList *L);
+bool isEmptyList(tList L);
+
+//OBSERVADORAS
+tPosL first(tList L);
+tPosL last(tList L);
+tPosL next(tPosL p, tList L);
+tPosL previous(tPosL p, tList L);
+tPosL findItem(tParticipantName d, tList L);
+tItemL getItem(tPosL p, tList L);
+
+//MODIFICADORAS
+bool insertItem(tItemL d, tPosL p, tList *L);
+void updateItem(tItemL d, tPosL p, tList *L);
+
+//DESTRUCTORAS
+void deleteAtPosition(tPosL p, tList *L);
 
 #endif
