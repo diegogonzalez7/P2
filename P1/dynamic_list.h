@@ -10,6 +10,7 @@
 #ifndef DYNAMIC_LIST_H
 #define DYNAMIC_LIST_H
 
+#include "stddef.h"
 #include "types.h"
 #define LNULL NULL
 
