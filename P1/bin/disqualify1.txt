@@ -4,5 +4,5 @@
 04 S 10
 05 N Country3 eu
 06 S 10
-07 D Country1 eu
+07 D Country1
 08 S 10

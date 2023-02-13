@@ -11,6 +11,7 @@
 #define STATIC_LIST_H
 
 #include "types.h"
+
 #define LNULL (-1) //Constante para indicar pos Nula.
 #define MAX 25 //Tamaño máximo del array cuando usamos implementación Estática.
 

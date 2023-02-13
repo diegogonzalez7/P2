@@ -11,11 +11,6 @@
 #define DYNAMIC_LIST_H
 
 #include "types.h"
-#include <stdbool.h>
-#include <string.h>
-#include <malloc.h>
-#include <stdlib.h>
-#include <stdio.h>
 #define LNULL NULL
 
 typedef struct Node* tPosL;

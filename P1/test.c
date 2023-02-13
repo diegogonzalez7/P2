@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #ifdef DYNAMIC_LIST
 #include "dynamic_list.h"
 #endif
@@ -38,7 +37,7 @@ int main() {
     /* insert */
     strcpy(item1.participantName, "country3");
     item1.numVotes = 0;
-    item1.EUParticipant=true;
+    item1.EUParticipant = true;
 
     insertItem(item1, LNULL, &list);
     print_list(list);
@@ -97,5 +96,4 @@ int main() {
 
     insertItem(item1, LNULL, &list);
     print_list(list);
-
 }

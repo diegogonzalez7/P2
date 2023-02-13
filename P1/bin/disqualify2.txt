@@ -2,7 +2,7 @@
 02 S 10
 03 N Country2 eu
 04 S 10
-05 V Country2 eu
+05 V Country2
 06 S 10
-07 D Country2 eu
+07 D Country2
 08 S 10
