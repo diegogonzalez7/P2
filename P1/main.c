@@ -31,7 +31,6 @@ void processCommand(char *commandNumber, char operacion, char *param1, char*para
 
     switch (operacion) {
         case 'N':
-            //printf("Command: %s %c %s %s\n", commandNumber, operacion, nacionalidad, param2);
             new(commandNumber, operacion, param1, param2, L);
             break;
         case 'V':
@@ -41,7 +40,7 @@ void processCommand(char *commandNumber, char operacion, char *param1, char*para
             disqualify(commandNumber, operacion, param1, L, votosnulos, votostotales);
             break;
         case 'S':
-            //stats(commandNumber, operacion, param1, *L);
+            stats(commandNumber, operacion, param1, *L);
             break;
         default:
             break;
@@ -52,6 +51,10 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
     tItemL r;
     r.numVotes = 0;
     strcpy(r.participantName, param1);
+    if (strcmp(param2, "eu")==0){
+        r.EUParticipant = true;
+    }
+    else r.EUParticipant = false;
     /*if(strcmp("eu", param2) != 0 && strcmp("non-eu", param2) != 0){
         printf("+⎵Error:⎵New⎵not⎵possible");
     }else{
@@ -63,7 +66,7 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
     if((findItem(param1, *L)) != LNULL){
         printf("+ Error: New not possible");
     }else{
-        insertItem(r, last(*L), L);
+        insertItem(r, LNULL, L);
         printf("* New: participant %s location %s\n", param1, param2);
     }
 }
@@ -104,21 +107,24 @@ void stats(char *commandNumber, char operacion, char* param1, tList L){
     tItemL r;
     tPosL p;
     int votos = atoi(param1);
+    char Europeo[7];
 
     printf("********************\n");
     float totalvotes = 0;
 
     printf("%s %c: totalvoters %d\n", commandNumber, operacion, votos);
     if(isEmptyList(L) != true){
-        for(p = first(L); p != LNULL; p = next(p, L)){
-            char Europeo[7];
+        for (p = first(L); p != LNULL; p = next(p, L)){
             r = getItem(p, L);
-            if(r.EUParticipant == false) strcpy(Europeo, "non-eu");
-            else strcpy(Europeo, "eu");
-            printf("Participant %s location %s numvotes %d (%.2f%)\n", r.participantName, Europeo, r.numVotes, totalvotes);
+            printf("Participant %s location ", r.participantName);
+            if (r.EUParticipant == true) {
+                printf("eu ");
+            }
+            else printf("non-eu ");
+            printf("numvotes %d (%.2f%%)\n", r.numVotes);
         }
-
-    }
+    }else
+        printf("+ Error: Stats not possible"); //lista vacía
 }
 
 void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
@@ -152,7 +158,7 @@ void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
 int main(int nargs, char **args) {
     tList L;
     createEmptyList(&L);
-    int votosnulos, votostotales;
+    int votosnulos=0, votostotales=0;
     char *file_name = "new.txt";
 
     if (nargs > 1) {

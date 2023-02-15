@@ -3,4 +3,4 @@
 set(impl STATIC)
 
 #Choose the input file for main (new.txt, vote.txt, disqualify1.txt...)
-set(input disqualify2.txt)
+set(input new.txt)
