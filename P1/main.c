@@ -22,7 +22,7 @@
 #endif
 
 void new(char *commandNumber, char operacion, char *param1, char *param2, tList *L);
-void stats(char *commandNumber, char operacion, char* pais, tList L);
+void stats(char *commandNumber, char operacion, char* pais, tList L, int votosnulos, int votostotales);
 void vote(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales);
 void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales);
 
@@ -31,6 +31,7 @@ void processCommand(char *commandNumber, char operacion, char *param1, char*para
 
     switch (operacion) {
         case 'N':
+            //printf("Command: %s %c %s %s\n", commandNumber, operacion, nacionalidad, param2);
             new(commandNumber, operacion, param1, param2, L);
             break;
         case 'V':
@@ -40,7 +41,7 @@ void processCommand(char *commandNumber, char operacion, char *param1, char*para
             disqualify(commandNumber, operacion, param1, L, votosnulos, votostotales);
             break;
         case 'S':
-            stats(commandNumber, operacion, param1, *L);
+            stats(commandNumber, operacion, param1, *L, votosnulos, votostotales);
             break;
         default:
             break;
@@ -51,7 +52,7 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
     tItemL r;
     r.numVotes = 0;
     strcpy(r.participantName, param1);
-    if (strcmp(param2, "eu")==0){
+    if (strcmp(param2, "eu")!=0){
         r.EUParticipant = true;
     }
     else r.EUParticipant = false;
@@ -74,21 +75,28 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
 void vote(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales){
     tItemL r;
     tPosL p;
+    char *EU;
     printf("********************\n");
     printf("%s %c: participant %s\n", commandNumber, operacion, param1);
     p = (findItem(param1, *L));
     if(p == LNULL){
-        printf("+ Error: Vote not possible. Participant %s not found. NULLVOTE", param1);
+        printf("+ Error: Vote not possible. Participant %s not found. NULLVOTE\n", param1);
+        votostotales = votostotales+1;
+        votosnulos++;
     }else{
         r = getItem(p, *L);
         r.numVotes++;
-        printf("* Vote: participant %s location %s numvotes %d\n", param1, (char*) r.EUParticipant, r.numVotes);
+        votostotales++;
+        if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
+        printf("* Vote: participant %s location %s", param1, EU);
+        printf(" numvotes %d\n", r.numVotes);
     }
 }
 
 void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales){
     tItemL r;
     tPosL p;
+    char *EU;
     printf("********************\n");
     printf("%s %c: participant %s\n", commandNumber, operacion, param1);
     p = (findItem(param1, *L));
@@ -98,33 +106,38 @@ void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int
         votosnulos += r.numVotes;
         votostotales -= r.numVotes;
         deleteAtPosition(p, L);
-        printf("* Disqualify: participant %s location %s\n", param1, (char*) r.EUParticipant);
+        if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
+        printf("* Disqualify: participant %s location %s\n", param1, EU);
     }
 }
 
 
-void stats(char *commandNumber, char operacion, char* param1, tList L){
+void stats(char *commandNumber, char operacion, char* param1, tList L, int votosnulos, int votostotales){
     tItemL r;
     tPosL p;
+    char *EU;
     int votos = atoi(param1);
-    char Europeo[7];
 
     printf("********************\n");
-    float totalvotes = 0;
 
     printf("%s %c: totalvoters %d\n", commandNumber, operacion, votos);
     if(isEmptyList(L) != true){
-        for (p = first(L); p != LNULL; p = next(p, L)){
+        for(p = first(L); p != LNULL; p = next(p, L)){
             r = getItem(p, L);
-            printf("Participant %s location ", r.participantName);
-            if (r.EUParticipant == true) {
-                printf("eu ");
-            }
-            else printf("non-eu ");
-            printf("numvotes %d (%.2f%%)\n", r.numVotes);
+            if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
+            printf("Participant %s location %s", r.participantName, EU);
+            printf(" numvotes %d ", r.numVotes);
+            if (r.numVotes == 0){
+                printf("(0.00%%)\n");
+
+            } else printf("(%.2f%%)\n", (float)r.numVotes / (float)votostotales * 100.0);
         }
-    }else
-        printf("+ Error: Stats not possible"); //lista vacía
+
+        printf("Null votes %d\n", votosnulos);
+        printf("Participation: %d votes from %d voters (0.00%%)\n", votostotales, votos);
+
+
+    }
 }
 
 void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
@@ -158,7 +171,7 @@ void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
 int main(int nargs, char **args) {
     tList L;
     createEmptyList(&L);
-    int votosnulos=0, votostotales=0;
+    int votosnulos = 0, votostotales = 0;
     char *file_name = "new.txt";
 
     if (nargs > 1) {

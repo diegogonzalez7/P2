@@ -50,14 +50,14 @@ cmake_ninja_workdir = C$:/Users/diegu/CLionProjects/pro2-2223/P1/cmake-build-deb
 build cmake_object_order_depends_target_main: phony || CMakeFiles/main.dir
 
 build CMakeFiles/main.dir/main.c.obj: C_COMPILER__main_Debug C$:/Users/diegu/CLionProjects/pro2-2223/P1/main.c || cmake_object_order_depends_target_main
-  DEFINES = -DINPUT_FILE=\"disqualify2.txt\" -DSTATIC_LIST
+  DEFINES = -DINPUT_FILE=\"vote.txt\" -DSTATIC_LIST
   DEP_FILE = CMakeFiles\main.dir\main.c.obj.d
   FLAGS = -g -Wall -Wextra -std=gnu99
   OBJECT_DIR = CMakeFiles\main.dir
   OBJECT_FILE_DIR = CMakeFiles\main.dir
 
 build CMakeFiles/main.dir/static_list.c.obj: C_COMPILER__main_Debug C$:/Users/diegu/CLionProjects/pro2-2223/P1/static_list.c || cmake_object_order_depends_target_main
-  DEFINES = -DINPUT_FILE=\"disqualify2.txt\" -DSTATIC_LIST
+  DEFINES = -DINPUT_FILE=\"vote.txt\" -DSTATIC_LIST
   DEP_FILE = CMakeFiles\main.dir\static_list.c.obj.d
   FLAGS = -g -Wall -Wextra -std=gnu99
   OBJECT_DIR = CMakeFiles\main.dir
@@ -91,14 +91,14 @@ build ../bin/main.exe: C_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/main.
 build cmake_object_order_depends_target_test_lists: phony || CMakeFiles/test_lists.dir
 
 build CMakeFiles/test_lists.dir/test.c.obj: C_COMPILER__test_lists_Debug C$:/Users/diegu/CLionProjects/pro2-2223/P1/test.c || cmake_object_order_depends_target_test_lists
-  DEFINES = -DINPUT_FILE=\"disqualify2.txt\" -DSTATIC_LIST
+  DEFINES = -DINPUT_FILE=\"vote.txt\" -DSTATIC_LIST
   DEP_FILE = CMakeFiles\test_lists.dir\test.c.obj.d
   FLAGS = -g -Wall -Wextra -std=gnu99
   OBJECT_DIR = CMakeFiles\test_lists.dir
   OBJECT_FILE_DIR = CMakeFiles\test_lists.dir
 
 build CMakeFiles/test_lists.dir/static_list.c.obj: C_COMPILER__test_lists_Debug C$:/Users/diegu/CLionProjects/pro2-2223/P1/static_list.c || cmake_object_order_depends_target_test_lists
-  DEFINES = -DINPUT_FILE=\"disqualify2.txt\" -DSTATIC_LIST
+  DEFINES = -DINPUT_FILE=\"vote.txt\" -DSTATIC_LIST
   DEP_FILE = CMakeFiles\test_lists.dir\static_list.c.obj.d
   FLAGS = -g -Wall -Wextra -std=gnu99
   OBJECT_DIR = CMakeFiles\test_lists.dir
