@@ -21,36 +21,37 @@
 #include "static_list.h"
 #endif
 
-void new(char *commandNumber, char operacion, char *param1, char *param2, tList *L);
-void stats(char *commandNumber, char operacion, char* pais, tList L, int votosnulos, int votostotales);
-void vote(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales);
-void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales);
+void new(char *commandNumber, char operacion, char *param1, char *param2, tList *L, int *votosnulos);
+void stats(char *commandNumber, char operacion, char* param1, tList L, const int *votosnulos);
+void vote(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos);
+void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos);
 
 
-void processCommand(char *commandNumber, char operacion, char *param1, char*param2, tList *L, int votosnulos, int votostotales) {
+void processCommand(char *commandNumber, char operacion, char *param1, char*param2, tList *L, int *votosnulos) {
 
     switch (operacion) {
         case 'N':
             //printf("Command: %s %c %s %s\n", commandNumber, operacion, nacionalidad, param2);
-            new(commandNumber, operacion, param1, param2, L);
+            new(commandNumber, operacion, param1, param2, L, votosnulos);
             break;
         case 'V':
-            vote(commandNumber, operacion, param1, L, votosnulos, votostotales);
+            vote(commandNumber, operacion, param1, L, votosnulos);
             break;
         case 'D':
-            disqualify(commandNumber, operacion, param1, L, votosnulos, votostotales);
+            disqualify(commandNumber, operacion, param1, L, votosnulos);
             break;
         case 'S':
-            stats(commandNumber, operacion, param1, *L, votosnulos, votostotales);
+            stats(commandNumber, operacion, param1, *L, votosnulos);
             break;
         default:
             break;
     }
 }
 
-void new(char *commandNumber, char operacion, char *param1, char *param2, tList *L){
+void new(char *commandNumber, char operacion, char *param1, char *param2, tList *L, int *votosnulos){
     tItemL r;
     r.numVotes = 0;
+    (*votosnulos) = 0;
     strcpy(r.participantName, param1);
     if (strcmp(param2, "eu")!=0){
         r.EUParticipant = true;
@@ -72,28 +73,29 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
     }
 }
 
-void vote(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales){
+void vote(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos){
     tItemL r;
     tPosL p;
     char *EU;
+    (*votosnulos) = 0;
     printf("********************\n");
     printf("%s %c: participant %s\n", commandNumber, operacion, param1);
     p = (findItem(param1, *L));
-    if(p == LNULL){
+    if((p == LNULL) || isEmptyList(*L)){
         printf("+ Error: Vote not possible. Participant %s not found. NULLVOTE\n", param1);
-        votostotales = votostotales+1;
-        votosnulos++;
+        (*votosnulos)++;
     }else{
         r = getItem(p, *L);
         r.numVotes++;
-        votostotales++;
+        updateItem(r, p, L);
         if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
         printf("* Vote: participant %s location %s", param1, EU);
         printf(" numvotes %d\n", r.numVotes);
     }
 }
 
-void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int votosnulos, int votostotales){
+
+void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos){
     tItemL r;
     tPosL p;
     char *EU;
@@ -102,9 +104,10 @@ void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int
     p = (findItem(param1, *L));
     if(p == LNULL){
         printf("+ Error: Disqualify not possible");
+        (*votosnulos)++;
     }else{
-        votosnulos += r.numVotes;
-        votostotales -= r.numVotes;
+        r = getItem(p, *L);
+        (*votosnulos) += r.numVotes;
         deleteAtPosition(p, L);
         if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
         printf("* Disqualify: participant %s location %s\n", param1, EU);
@@ -112,38 +115,48 @@ void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int
 }
 
 
-void stats(char *commandNumber, char operacion, char* param1, tList L, int votosnulos, int votostotales){
+void stats(char *commandNumber, char operacion, char* param1, tList L, const int *votosnulos){
     tItemL r;
     tPosL p;
     char *EU;
+    int votosnuloss;
     int votos = atoi(param1);
+    if(votosnulos == NULL){
+        votosnuloss = 0;
+    }else{
+        votosnuloss = (*votosnulos);
+    }
 
+    int votostotales = 0;
     printf("********************\n");
 
     printf("%s %c: totalvoters %d\n", commandNumber, operacion, votos);
     if(isEmptyList(L) != true){
         for(p = first(L); p != LNULL; p = next(p, L)){
             r = getItem(p, L);
+            votostotales = votosnuloss + r.numVotes;
             if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
             printf("Participant %s location %s", r.participantName, EU);
             printf(" numvotes %d ", r.numVotes);
             if (r.numVotes == 0){
                 printf("(0.00%%)\n");
 
-            } else printf("(%.2f%%)\n", (float)r.numVotes / (float)votostotales * 100.0);
+            } else printf("(%.2f%%)\n", (float)r.numVotes * 100.0);
         }
 
-        printf("Null votes %d\n", votosnulos);
-        printf("Participation: %d votes from %d voters (0.00%%)\n", votostotales, votos);
+        printf("Null votes %d\n", votosnuloss);
+        printf("Participation: %d votes from %d voters (%.2f%%)\n", votostotales, votos, (float)votostotales/(float)votos *100.0);
 
 
+    }else{
+        printf("+ Error: Stats not possible\n");
     }
+
 }
 
-void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
+void readTasks(char *filename, tList *L, int *votosnulos) {
     FILE *f = NULL;
     char *commandNumber, *command, *param1, *param2;
-    int param3;
     const char delimiters[] = " \n\r";
     char buffer[MAX_BUFFER];
 
@@ -157,7 +170,7 @@ void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
             param1 = strtok(NULL, delimiters);
             param2 = strtok(NULL, delimiters);
 
-            processCommand(commandNumber, command[0], param1, param2, L, votosnulos, votostotales);
+            processCommand(commandNumber, command[0], param1, param2, L, votosnulos);
         }
 
         fclose(f);
@@ -171,23 +184,21 @@ void readTasks(char *filename, tList *L, int votosnulos, int votostotales) {
 int main(int nargs, char **args) {
     tList L;
     createEmptyList(&L);
-    int votosnulos = 0, votostotales = 0;
+    int *votosnulos = malloc(sizeof (int));
     char *file_name = "new.txt";
 
     if (nargs > 1) {
         file_name = args[1];
     } else {
-        #ifdef INPUT_FILE
+#ifdef INPUT_FILE
         file_name = INPUT_FILE;
-        #endif
+#endif
     }
 
-    readTasks(file_name, &L, votosnulos, votostotales);
+    readTasks(file_name, &L, votosnulos);
 
     return 0;
 }
-
-
 
 
 
