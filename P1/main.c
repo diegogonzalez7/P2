@@ -31,16 +31,36 @@ void processCommand(char *commandNumber, char operacion, char *param1, char*para
 
     switch (operacion) {
         case 'N':
-            //printf("Command: %s %c %s %s\n", commandNumber, operacion, nacionalidad, param2);
+            /*
+             * Objetivo: Añadir un nuevo participante al concurso con 0 votos inicialmente.
+             * Entradas: El nombre del participante (char[NAME_LENGTH_LIMIT]) y si es europeo o no (bool).
+             * Salida: La lista de participantes con el participante añadido o un mensaje de error en caso de que no se pueda añadir .
+             */
             new(commandNumber, operacion, param1, param2, L, votosnulos);
             break;
         case 'V':
+            /*
+             * Objetivo: Añadir un voto a un participante.
+             * Entradas: El nombre del participante (char[NAME_LENGTH_LIMIT]) al cual se le quiere sumar un voto.
+             * Salida: La lista con el número de votos de dicho participante incrementado o un voto nulo si el participante no existe.
+             */
             vote(commandNumber, operacion, param1, L, votosnulos);
             break;
         case 'D':
+            /*
+             * Objetivo: Descalificar un participante del concurso.
+             * Entradas: El nombre del participante (char[NAME_LENGTH_LIMIT]) que se quiere descalificar.
+             * Salida: La lista de participante sin este participante o un mensaje de error si no se pudo eliminar.
+             */
             disqualify(commandNumber, operacion, param1, L, votosnulos);
             break;
         case 'S':
+            /*
+             * Objetivo: Ver las estadísticas de participación y votos de todos los participantes.
+             * Entradas: El número total de votantes (int).
+             * Salida: -.
+             * Precondición: El número de votos totales no puede ser mayor al número total de votantes.
+             */
             stats(commandNumber, operacion, param1, *L, votosnulos);
             break;
         default:
@@ -142,7 +162,7 @@ void stats(char *commandNumber, char operacion, char* param1, tList L, const int
             if (r.numVotes == 0){
                 printf("(0.00%%)\n");
 
-            } else printf("(%.2f%%)\n", (float)r.numVotes / ((float) votostotales - votosnuloss) * 100.0);
+            } else printf("(%.2f%%)\n", (float)r.numVotes / ((float) votostotales - (float) votosnuloss) * 100.0);
         }
 
         printf("Null votes %d\n", votosnuloss);
