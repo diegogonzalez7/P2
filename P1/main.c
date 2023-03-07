@@ -128,6 +128,7 @@ void stats(char *commandNumber, char operacion, char* param1, tList L, const int
     }
 
     int votostotales = 0;
+
     printf("********************\n");
 
     printf("%s %c: totalvoters %d\n", commandNumber, operacion, votos);
@@ -141,7 +142,7 @@ void stats(char *commandNumber, char operacion, char* param1, tList L, const int
             if (r.numVotes == 0){
                 printf("(0.00%%)\n");
 
-            } else printf("(%.2f%%)\n", (float)r.numVotes * 100.0);
+            } else printf("(%.2f%%)\n", (float)r.numVotes / ((float) votostotales - votosnuloss) * 100.0);
         }
 
         printf("Null votes %d\n", votosnuloss);
