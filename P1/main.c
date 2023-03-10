@@ -149,9 +149,12 @@ void stats(char *commandNumber, char operacion, char* param1, tList L, const int
     }else{
         votosnuloss = (*votosnulos);
     }
-    for (q = first(L);q != LNULL;q = next(q, L)) {
-        r = getItem(q, L);
-        votosvalidoss += r.numVotes;
+
+    if (!isEmptyList(L)) {
+        for (q = first(L);q != LNULL;q = next(q, L)) {
+            r = getItem(q, L);
+            votosvalidoss += r.numVotes;
+        }
     }
 
     printf("********************\n");
