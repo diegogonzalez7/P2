@@ -75,11 +75,7 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, tList 
     if (strcmp(param2, "eu") != 0) {
         r.EUParticipant = true;
     } else r.EUParticipant = false;
-    /*if(strcmp("eu", param2) != 0 && strcmp("non-eu", param2) != 0){
-        printf("+⎵Error:⎵New⎵not⎵possible");
-    }else{
 
-    }*/
     printf("********************\n");
     printf("%s %c: participant %s location %s\n", commandNumber, operacion, param1, param2);
 
@@ -126,7 +122,7 @@ void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int
     printf("%s %c: participant %s\n", commandNumber, operacion, param1);
     p = (findItem(param1, *L));
     if(p == LNULL){
-        printf("+ Error: Disqualify not possible");
+        printf("+ Error: Disqualify not possible\n");
     }else{
         r = getItem(p, *L);
         (*votosnulos) += r.numVotes;
