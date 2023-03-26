@@ -1,0 +1,5 @@
+C:/Users/diegu/CLionProjects/pro2-2223/P2/cmake-build-debug/CMakeFiles/test_participant_list.dir
+C:/Users/diegu/CLionProjects/pro2-2223/P2/cmake-build-debug/CMakeFiles/test_jury_list.dir
+C:/Users/diegu/CLionProjects/pro2-2223/P2/cmake-build-debug/CMakeFiles/main.dir
+C:/Users/diegu/CLionProjects/pro2-2223/P2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/diegu/CLionProjects/pro2-2223/P2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
