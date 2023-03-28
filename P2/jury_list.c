@@ -30,7 +30,7 @@ tPosJ nextJ(tPosJ p, tListJ L){
     if(p == L.lastPos){
         return NULLJ;
     }else{
-        return ++p; //es el equivalente a poner (p+1);
+        return (p+1); //es el equivalente a poner (p+1);
     }
 }
 

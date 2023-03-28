@@ -19,6 +19,7 @@
 void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J);
 void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J);
 void vote(char* commandNumber, char operacion, char *param1, char* param2, tListJ *J);
+void stats(char *commandNumber, char operacion, tListJ J);
 
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
@@ -35,6 +36,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
         case 'D':
             break;
         case 'S':
+            stats(commandNumber, command, *J);
             break;
         case 'R':
             break;
@@ -145,31 +147,45 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
 }*/
 
 
-void stats(char *commandNumber, char operacion, char* param1, tListJ J, const int *votosnulos){
+void stats(char *commandNumber, char operacion, tListJ J){
     tItemJ r;
+    tItemP y;
     tPosJ p,q;
+    tPosP x;
     char *EU;
-    int votosnuloss;
-    int votosvalidoss = 0;
-    int votos = atoi(param1);
-    if(votosnulos == NULL){
-        votosnuloss = 0;
-    }else{
-        votosnuloss = (*votosnulos);
-    }
+
+    printf("********************\n");
+    printf("%s %c:\n", commandNumber, operacion);
+
 
     if (!isEmptyListJ(J)) {
-        for (q = firstJ(J);q != NULLJ;q = nextJ(q, J)) {
+        q = firstJ(J);
+        while (q != lastJ(J)) {
             r = getItemJ(q, J);
+            printf("Jury %s\n", r.juryName);
+            if(isEmptyListP(r.participantList)){
+                printf("No participants\n");
+            }else{
+                for(x = firstP(r.participantList); x != NULLP; x = nextP(x, r.participantList)){
+                    y = getItemP(x, r.participantList);
+                    if(!y.EUParticipant) EU = "eu"; else EU = "non-eu";
+                    printf("Participant %s location %s numvotes %d", y.participantName, EU, r.totalVoters);
+                    if (r.validVoters == 0){
+                        printf("(0.00%%)\n");
+
+                    } else printf("(%.2f%%)\n", (float)y.numVotes / ((float) r.validVoters) * 100.0);
+                }
+            }
+            printf("Nullvotes %d\n", r.nullVotes);
+            printf("Participation: %d votes from %d voters (%.2f%%)\n\n", r.nullVotes, r.totalVoters, ((float)r.nullVotes)/(float)r.totalVoters * 100.0);
+            q = nextJ(q, J);
         }
     }
 
-    printf("********************\n");
 
-    printf("%s %c: totalvoters %d\n", commandNumber, operacion, votos);
-    if(isEmptyListJ(J) != true){
+    /*if(isEmptyListJ(J) != true){
         for(p = firstJ(J); p != NULLJ; p = nextJ(p, J)){
-            r = getItemJ(p, J);
+            r = getItemJ(p, );
             if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
             printf("Participant %s location %s", r.participantName, EU);
             printf(" numvotes %d ", r.numVotes);
@@ -185,7 +201,7 @@ void stats(char *commandNumber, char operacion, char* param1, tListJ J, const in
 
     }else{
         printf("+ Error: Stats not possible\n");
-    }
+    }*/
 
 }
 
