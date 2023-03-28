@@ -112,7 +112,7 @@ tPosP findItemP(tParticipantName i, tListP L){
         return NULLP;
     }else{
         for(q = L; (q != NULLP) && (strcmp(q->data.participantName, i) < 0); q = q->next);
-        if(q != NULLP && (strcmp(q->data.participantName, i) == 0)){
+        if((q != NULLP) && (strcmp(q->data.participantName, i) == 0)){
             return q;
         }else{
             return NULLP;
