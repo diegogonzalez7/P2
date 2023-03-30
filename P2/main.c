@@ -159,11 +159,11 @@ void stats(char *commandNumber, char operacion, tListJ J){
 
 
     if (!isEmptyListJ(J)) {
-        q = firstJ(J);
-        while (q != lastJ(J)) {
-            r = getItemJ(q, J);
+
+        for (p = firstJ(J); p != NULLJ; p = nextJ(p, J)) {
+            r = getItemJ(p, J);
             printf("Jury %s\n", r.juryName);
-            if(isEmptyListP(r.participantList)){
+            if(isEmptyListP(r.participantList)){ //FALLA AQUI PORQUE DEBERIA ENTRAR EN EL BUCLE y NO LO HACE
                 printf("No participants\n");
             }else{
                 for(x = firstP(r.participantList); x != NULLP; x = nextP(x, r.participantList)){
@@ -178,8 +178,9 @@ void stats(char *commandNumber, char operacion, tListJ J){
             }
             printf("Nullvotes %d\n", r.nullVotes);
             printf("Participation: %d votes from %d voters (%.2f%%)\n\n", r.nullVotes, r.totalVoters, ((float)r.nullVotes)/(float)r.totalVoters * 100.0);
-            q = nextJ(q, J);
         }
+    }else{
+        printf("+ Error: Stats not possible\n");
     }
 
 
