@@ -20,7 +20,7 @@ typedef int tPosJ;
 typedef struct tItemJ { //Creamos el struct con los datos del jurado.
     tJuryName juryName;
     tNumVotes totalVoters;
-    tNumVotes validVoters;
+    tNumVotes validVotes;
     tNumVotes nullVotes;
     tListP participantList;
 } tItemJ;
