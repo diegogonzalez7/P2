@@ -27,15 +27,12 @@ tPosJ lastJ(tListJ L){
 }
 
 tPosJ nextJ(tPosJ p, tListJ L){
-    if(p == L.lastPos){
-        return NULLJ;
-    }else{
-        return (p+1); //es el equivalente a poner (p+1);
-    }
+    if (p == L.lastPos) return NULLJ;
+    return p+1;
 }
 
 tPosJ previousJ(tPosJ p, tListJ L){
-    return --p;
+    return p-1;
 }
 
 bool insertItemJ(tItemJ d, tListJ *L){

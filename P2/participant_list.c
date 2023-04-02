@@ -18,21 +18,19 @@ bool isEmptyListP(tListP L){
 }
 
 tPosP firstP(tListP L){
-    return (L);
+    return L;
 }
 
 tPosP lastP(tListP L){
     tPosP q;
-    for(q = L; q->next != NULLP; q = q->next);
+    q = L;
+    while (q->next != NULLP)
+        q = q->next;
     return q;
 }
 
 tPosP nextP(tPosP p, tListP L){
-    if(lastP(L) == p){
-        return NULLP;
-    }else{
-        return(p->next);
-    }
+    return p->next;
 }
 
 tPosP previousP(tPosP p, tListP L){
@@ -68,7 +66,7 @@ bool insertItemP(tItemP d, tListP * L){
     }else{
         q -> data = d;
         q -> next = NULLP;
-        if(isEmptyListP(*L)){
+        if(*L == NULLP){
             *L = q;
         }else if(strcmp(d.participantName, (*L)->data.participantName) < 0){
             q -> next = *L;

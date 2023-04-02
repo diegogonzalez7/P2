@@ -19,7 +19,7 @@
 void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J);
 void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J);
 void vote(char* commandNumber, char operacion, char *param1, char* param2, tListJ *J);
-//void stats(char *commandNumber, char operacion, tListJ J);
+void stats(char *commandNumber, char operacion, tListJ *J);
 
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
@@ -37,7 +37,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
         case 'D':
             break;
         case 'S':
-            //stats(commandNumber, command, *J);
+            stats(commandNumber, command, J);
             break;
         case 'R':
             break;
@@ -48,7 +48,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
     }
 }
 
-void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J){    //ACABADO
+void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J){            //ACABADO
     tItemJ jurado;
     tPosJ q;
     strcpy(jurado.juryName, param1);
@@ -63,11 +63,13 @@ void create(char *commandNumber, char operacion, char *param1, char *param2, tLi
     if(insertItemJ(jurado, J) && q == NULLJ){    //puede insertar y el jurado no existe
         printf("* Create: jury %s totalvoters %s\n", param1, param2);
         createEmptyListP(&jurado.participantList);
+        q = findItemJ(jurado.juryName, *J);
+        updateItemJ(jurado, q, J);
     }else{
         printf("+ Error: Create not possible\n");
     }
 }
-void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J){
+void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J){ //ACABADO
     tItemJ jurado;
     tItemP participante;
     tPosP p; tPosJ j;
@@ -78,7 +80,6 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, char *
         participante.EUParticipant = true;
     } else participante.EUParticipant = false;
 
-    //strcpy(t.juryName, param1);
 
     printf("********************\n");
     printf("%s %c: jury %s participant %s location %s\n", commandNumber, operacion, param1, param2, param3);
@@ -100,7 +101,7 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, char *
     }
 }
 
-void vote(char *commandNumber, char operacion, char *param1, char* param2, tListJ *J) {
+void vote(char *commandNumber, char operacion, char *param1, char* param2, tListJ *J) {             //ACABADO
     tItemJ jurado;
     tItemP participante;
     tPosJ j; tPosP p;
@@ -119,7 +120,7 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
             printf("+ Error: Vote not possible. Participant %s not found in jury %s. NULLVOTE\n", param2, param1);
             jurado.nullVotes++;
             updateItemJ(jurado, j, J);
-            printf("Los votos nulos del %s son %d, y los validos son %d\n",jurado.juryName, jurado.nullVotes, jurado.validVotes);
+            //printf("Los votos nulos del %s son %d, y los validos son %d\n",jurado.juryName, jurado.nullVotes, jurado.validVotes);
         } else {
             participante = getItemP(p, jurado.participantList);
             jurado.validVotes++;
@@ -129,7 +130,7 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
                    participante.participantName, EU, participante.numVotes);
             updateItemP(participante, p, &jurado.participantList);
             updateItemJ(jurado, j, J);
-            printf("Los votos nulos del %s son %d, y los validos son %d\n",jurado.juryName, jurado.nullVotes, jurado.validVotes);
+            //printf("Los votos nulos del %s son %d, y los validos son %d\n",jurado.juryName, jurado.nullVotes, jurado.validVotes);
         }
     }
 }
@@ -153,63 +154,75 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
     }
 }*/
 
-/*
-void stats(char *commandNumber, char operacion, tListJ J){
-    tItemJ r;
-    tItemP y;
-    tPosJ p,q;
-    tPosP x;
+
+void stats(char *commandNumber, char operacion, tListJ *J) {
+    tItemJ jurado;
+    tItemP participante;
+    tPosJ j;
+    tPosP p;
     char *EU;
 
     printf("********************\n");
     printf("%s %c:\n", commandNumber, operacion);
+    if (isEmptyListJ(*J)) {
+        printf("+ Error: Stats not possible\n");
 
-
-    if (!isEmptyListJ(J)) {
-
-        for (p = firstJ(J); p != NULLJ; p = nextJ(p, J)) {
-            r = getItemJ(p, J);
-            printf("Jury %s\n", r.juryName);
-            if(isEmptyListP(r.participantList)){ //FALLA AQUI PORQUE DEBERIA ENTRAR EN EL BUCLE y NO LO HACE
+    } else {
+        j = firstJ(*J);
+        while (j != NULLJ) {
+            jurado = getItemJ(j, *J);
+            printf("Jury %s\n", jurado.juryName);
+            if (isEmptyListP(jurado.participantList)) {
                 printf("No participants\n");
-            }else{
-                for(x = firstP(r.participantList); x != NULLP; x = nextP(x, r.participantList)){
-                    y = getItemP(x, r.participantList);
-                    if(!y.EUParticipant) EU = "eu"; else EU = "non-eu";
-                    printf("Participant %s location %s numvotes %d", y.participantName, EU, r.totalVoters);
-                    if (r.validVoters == 0){
+            } else {
+                p = firstP(jurado.participantList);
+                while (p != NULLP) {
+                    participante = getItemP(p, jurado.participantList);
+                    if (!participante.EUParticipant) EU = "eu"; else EU = "non-eu";
+                    printf("Participant %s location %s numvotes %d ", participante.participantName, EU,
+                           participante.numVotes);
+                    if (jurado.validVotes == 0) {
                         printf("(0.00%%)\n");
-
-                    } else printf("(%.2f%%)\n", (float)y.numVotes / ((float) r.validVoters) * 100.0);
+                    } else printf("(%.2f%%)\n", (float) participante.numVotes / ((float) jurado.validVotes) * 100.0);
+                    p = nextP(p, jurado.participantList);
                 }
             }
-            printf("Nullvotes %d\n", r.nullVotes);
-            printf("Participation: %d votes from %d voters (%.2f%%)\n\n", r.nullVotes, r.totalVoters, ((float)r.nullVotes)/(float)r.totalVoters * 100.0);
+            printf("Nullvotes %d\n", jurado.nullVotes);
+            printf("Participation: %d votes from %d voters (%.2f%%)\n\n", (jurado.validVotes + jurado.nullVotes), jurado.totalVoters,
+                   ((float) jurado.validVotes + (float) jurado.nullVotes) / (float) jurado.totalVoters * 100.0);
+            j = nextJ(j, *J);
         }
-    }else{
-        printf("+ Error: Stats not possible\n");
     }
+}
 
-
-    /*if(isEmptyListJ(J) != true){
-        for(p = firstJ(J); p != NULLJ; p = nextJ(p, J)){
-            r = getItemJ(p, );
-            if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
-            printf("Participant %s location %s", r.participantName, EU);
-            printf(" numvotes %d ", r.numVotes);
-            if (votosvalidoss == 0){
-                printf("(0.00%%)\n");
-
-            } else printf("(%.2f%%)\n", (float)r.numVotes / ((float) votosvalidoss) * 100.0);
+/*
+    if (!isEmptyListJ(J)) {
+        for (j = firstJ(J); nextJ(j,J) != NULLJ; j = nextJ(j, J)) {
+            jurado = getItemJ(j, J);
+            printf("Jury %s\n", jurado.juryName);
+            if (isEmptyListP(jurado.participantList)) { //FALLA AQUI PORQUE DEBERIA ENTRAR EN EL BUCLE y NO LO HACE
+                printf("No participants\n");
+            } else {
+                for (p = firstP(jurado.participantList); nextP(p, jurado.participantList); p = nextP(p,
+                                                                                                     jurado.participantList)) {
+                    participante = getItemP(p, jurado.participantList);
+                    if (!participante.EUParticipant) EU = "eu"; else EU = "non-eu";
+                    printf("Participant %s location %s numvotes %d", participante.participantName, EU,
+                           jurado.totalVoters);
+                    if (jurado.validVotes == 0) {
+                        printf("(0.00%%)\n");
+                    } else printf("(%.2f%%)\n", (float) participante.numVotes / ((float) jurado.validVotes) * 100.0);
+                }
+            }
+            printf("Nullvotes %d\n", jurado.nullVotes);
+            printf("Participation: %d votes from %d voters (%.2f%%)\n\n", jurado.nullVotes, jurado.totalVoters,
+                   ((float) jurado.nullVotes) / (float) jurado.totalVoters * 100.0);
         }
-
-        printf("Null votes %d\n", votosnuloss);
-        printf("Participation: %d votes from %d voters (%.2f%%)\n", votosvalidoss + votosnuloss, votos, ((float)votosvalidoss + (float) votosnuloss)/(float)votos *100.0);
-
-
-    }else{
+    } else {
         printf("+ Error: Stats not possible\n");
     }*/
+
+
 
 
 
