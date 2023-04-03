@@ -16,10 +16,13 @@
 
 #define MAX_BUFFER 255
 
+//PRIMERA ENTREGA
 void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J);
 void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J);
 void vote(char* commandNumber, char operacion, char *param1, char* param2, tListJ *J);
 void stats(char *commandNumber, char operacion, tListJ *J);
+//SEGUNDA ENTREGA
+void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J);
 
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
@@ -35,6 +38,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
             vote(commandNumber, command, param1, param2, J);
             break;
         case 'D':
+            disqualify(commandNumber, command, param1, J);
             break;
         case 'S':
             stats(commandNumber, command, J);
@@ -135,27 +139,7 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
     }
 }
 
-
-/*void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos){
-    tItemL r;
-    tPosL p;
-    char *EU;
-    printf("********************\n");
-    printf("%s %c: participant %s\n", commandNumber, operacion, param1);
-    p = (findItem(param1, *L));
-    if(p == LNULL){
-        printf("+ Error: Disqualify not possible\n");
-    }else{
-        r = getItem(p, *L);
-        (*votosnulos) += r.numVotes;
-        deleteAtPosition(p, L);
-        if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
-        printf("* Disqualify: participant %s location %s\n", param1, EU);
-    }
-}*/
-
-
-void stats(char *commandNumber, char operacion, tListJ *J) {
+void stats(char *commandNumber, char operacion, tListJ *J) {                                        //ACABADO :)
     tItemJ jurado;
     tItemP participante;
     tPosJ j;
@@ -195,35 +179,57 @@ void stats(char *commandNumber, char operacion, tListJ *J) {
     }
 }
 
-/*
-    if (!isEmptyListJ(J)) {
-        for (j = firstJ(J); nextJ(j,J) != NULLJ; j = nextJ(j, J)) {
-            jurado = getItemJ(j, J);
+void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J) {
+    tItemJ jurado;
+    tItemP participante;
+    tPosP p; tPosJ j;
+
+    printf("********************\n");
+    printf("%s %c: participant %s\n", commandNumber, operacion, param1);
+
+    if (isEmptyListJ(*J)) {
+        printf("+ Error: Disqualify not possible\n");
+    }
+    else {
+        j = firstJ(*J);
+        while (j != NULLJ) {
+            jurado = getItemJ(j,*J);
             printf("Jury %s\n", jurado.juryName);
-            if (isEmptyListP(jurado.participantList)) { //FALLA AQUI PORQUE DEBERIA ENTRAR EN EL BUCLE y NO LO HACE
-                printf("No participants\n");
+            p = findItemP(param1, jurado.participantList);
+            if (p != NULLP) {
+                participante = getItemP(p, jurado.participantList);
+                printf("Participant %s disqualified\n\n", participante.participantName);
+                jurado.nullVotes += participante.numVotes;
+                jurado.validVotes -= participante.numVotes;
+                deleteAtPositionP(p,&jurado.participantList);
+                updateItemJ(jurado, j, J);
+                //printf("Los votos nulos de %s son %d\n", jurado.juryName, jurado.nullVotes);
             } else {
-                for (p = firstP(jurado.participantList); nextP(p, jurado.participantList); p = nextP(p,
-                                                                                                     jurado.participantList)) {
-                    participante = getItemP(p, jurado.participantList);
-                    if (!participante.EUParticipant) EU = "eu"; else EU = "non-eu";
-                    printf("Participant %s location %s numvotes %d", participante.participantName, EU,
-                           jurado.totalVoters);
-                    if (jurado.validVotes == 0) {
-                        printf("(0.00%%)\n");
-                    } else printf("(%.2f%%)\n", (float) participante.numVotes / ((float) jurado.validVotes) * 100.0);
-                }
+                printf("No participant %s\n\n", param1);
             }
-            printf("Nullvotes %d\n", jurado.nullVotes);
-            printf("Participation: %d votes from %d voters (%.2f%%)\n\n", jurado.nullVotes, jurado.totalVoters,
-                   ((float) jurado.nullVotes) / (float) jurado.totalVoters * 100.0);
+            j = nextJ(j,*J);
         }
-    } else {
-        printf("+ Error: Stats not possible\n");
-    }*/
+    }
 
+}
 
-
+/*void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos){
+    tItemL r;
+    tPosL p;
+    char *EU;
+    printf("********************\n");
+    printf("%s %c: participant %s\n", commandNumber, operacion, param1);
+    p = (findItem(param1, *L));
+    if(p == LNULL){
+        printf("+ Error: Disqualify not possible\n");
+    }else{
+        r = getItem(p, *L);
+        (*votosnulos) += r.numVotes;
+        deleteAtPosition(p, L);
+        if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
+        printf("* Disqualify: participant %s location %s\n", param1, EU);
+    }
+}*/
 
 
 void readTasks(char *filename, tListP *P, tListJ *J) {
