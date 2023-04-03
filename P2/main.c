@@ -23,7 +23,7 @@ void vote(char* commandNumber, char operacion, char *param1, char* param2, tList
 void stats(char *commandNumber, char operacion, tListJ *J);
 //SEGUNDA ENTREGA
 void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J);
-
+void remov(char *commandNumber, char operacion, tListJ *J);
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
 
@@ -44,6 +44,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
             stats(commandNumber, command, J);
             break;
         case 'R':
+            remov(commandNumber, command, J);
             break;
         case 'W':
             break;
@@ -210,27 +211,37 @@ void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J) {
             j = nextJ(j,*J);
         }
     }
-
 }
 
-/*void disqualify(char *commandNumber, char operacion, char* param1, tList *L, int *votosnulos){
-    tItemL r;
-    tPosL p;
-    char *EU;
-    printf("********************\n");
-    printf("%s %c: participant %s\n", commandNumber, operacion, param1);
-    p = (findItem(param1, *L));
-    if(p == LNULL){
-        printf("+ Error: Disqualify not possible\n");
-    }else{
-        r = getItem(p, *L);
-        (*votosnulos) += r.numVotes;
-        deleteAtPosition(p, L);
-        if(!r.EUParticipant) EU = "eu"; else EU = "non-eu" ;
-        printf("* Disqualify: participant %s location %s\n", param1, EU);
-    }
-}*/
+void remov(char *commandNumber, char operacion, tListJ *J) {
+    tItemJ jurado;
+    tItemP participante;
+    tPosJ j; tPosP p;
+    int contador_jurados = 0;
+    bool flag = false;
 
+    printf("********************\n");
+    printf("%s %c: \n", commandNumber, operacion);
+
+    if (isEmptyListJ(*J)) {
+        printf("+ Error: Remove not possible\n");
+    } else {
+        j = firstJ(*J);
+        while (j != NULLJ) {
+            jurado = getItemJ(j,*J);
+            if (jurado.validVotes == 0) {
+                printf("* Remove: jury %s\n", jurado.juryName);
+                deleteAtPositionJ(j,J);
+                contador_jurados ++;
+            }
+            j = nextJ(j,*J);
+            if (contador_jurados == 0) {
+                printf("+ Error: Remove not possible\n");
+            }
+        }
+    }
+}
+//Solamente elimina al jurado1 porque al ser la primera posición de la lista de jurados, pasa a la siguiente y se salta el jurado2
 
 void readTasks(char *filename, tListP *P, tListJ *J) {
 
