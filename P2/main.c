@@ -24,6 +24,7 @@ void stats(char *commandNumber, char operacion, tListJ *J);
 //SEGUNDA ENTREGA
 void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J);
 void remov(char *commandNumber, char operacion, tListJ *J);
+void winners(char *commandNumber, char operacion, tListJ *J);
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
 
@@ -47,6 +48,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
             remov(commandNumber, command, J);
             break;
         case 'W':
+            winners(commandNumber, command, J);
             break;
         default:
             break;
@@ -228,20 +230,64 @@ void remov(char *commandNumber, char operacion, tListJ *J) {
     } else {
         j = firstJ(*J);
         while (j != NULLJ) {
+            j = firstJ(*J); // Te faltaba esto, saltaba al jurado3 porque el deleteatPosition ya te manda a la siguiente posicion por tanto hacias dos saltos
+            //entonces teniamos que mandar al first arriba del while para que siempre empezara a comprobar desde la primera posicion.
             jurado = getItemJ(j,*J);
             if (jurado.validVotes == 0) {
                 printf("* Remove: jury %s\n", jurado.juryName);
                 deleteAtPositionJ(j,J);
                 contador_jurados ++;
             }
-            j = nextJ(j,*J);
+            j = nextJ(j, *J);
             if (contador_jurados == 0) {
                 printf("+ Error: Remove not possible\n");
             }
         }
     }
 }
-//Solamente elimina al jurado1 porque al ser la primera posición de la lista de jurados, pasa a la siguiente y se salta el jurado2
+void winners(char *commandNumber, char operacion, tListJ *J){
+    tItemJ jurado;
+    tItemP participante, participante2;
+    tPosJ j; tPosP p;
+    int cont_participantes = 0;
+    int aux = 0, aux1 = 0;
+
+
+    printf("********************\n");
+    printf("%s %c: \n", commandNumber, operacion);
+
+    if(isEmptyListJ(*J)){
+        printf("+ Error: Winners not possible\n");
+    }else{
+        j = firstJ(*J);
+        while(j != NULLJ){
+            jurado = getItemJ(j, *J);
+            printf("Jury %s\n", jurado.juryName);
+            if (isEmptyListP(jurado.participantList)) {
+                printf("Location eu: No winner\n");
+                printf("Location non-eu: No winner\n");
+            } else {
+                p = firstP(jurado.participantList);
+                while (p != NULLP) {
+                    participante = getItemP(p, jurado.participantList);
+                    if(!participante.EUParticipant){
+                        if(aux1 < participante.numVotes){
+                            printf("Location eu: Participant %s numvotes %d\n", participante.participantName, participante.numVotes);
+                        }
+                        aux1 = participante.numVotes;
+                    }else{
+                        if(aux < participante.numVotes){
+                            printf("Location non-eu: Participant %s numvotes %d\n", participante.participantName, participante.numVotes);
+                        }
+                        aux = participante.numVotes;
+                    }
+                    p = nextP(p, jurado.participantList);
+                }
+            }
+            j = nextJ(j, *J);
+        }
+    }
+}
 
 void readTasks(char *filename, tListP *P, tListJ *J) {
 
