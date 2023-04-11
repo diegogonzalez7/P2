@@ -232,7 +232,7 @@ void remov(char *commandNumber, char operacion, tListJ *J) {
         printf("+ Error: Remove not possible\n");
     } else {
         j = firstJ(*J);
-        while (j <= J->lastPos) {
+        while (j <= lastJ(*J) && j != NULLJ) {
             jurado = getItemJ(j,*J);
             if (jurado.validVotes == 0) {
                 printf("* Remove: jury %s\n", jurado.juryName);
@@ -250,10 +250,14 @@ void remov(char *commandNumber, char operacion, tListJ *J) {
 
 void winners(char *commandNumber, char operacion, tListJ *J){
     tItemJ jurado;
-    tItemP participante, participante2;
+    tItemP participante, aux_eu, aux_non_eu;
     tPosJ j; tPosP p;
     int cont_participantes = 0;
-    int aux = 0, aux1 = 0;
+    int cnt_eu = 0;
+    int cnt_non_eu = 0;
+
+    aux_eu.numVotes = 0;
+    aux_non_eu.numVotes = 0;
 
 
     printf("********************\n");
@@ -274,17 +278,34 @@ void winners(char *commandNumber, char operacion, tListJ *J){
                 while (p != NULLP) {
                     participante = getItemP(p, jurado.participantList);
                     if(!participante.EUParticipant){
-                        if(aux1 < participante.numVotes){
-                            printf("Location eu: Participant %s numvotes %d\n", participante.participantName, participante.numVotes);
+                        cnt_eu ++;
+                        if(aux_eu.numVotes <= participante.numVotes){
+                            aux_eu.numVotes = participante.numVotes;
+                            strcpy(aux_eu.participantName, participante.participantName);
                         }
-                        aux1 = participante.numVotes;
                     }else{
-                        if(aux < participante.numVotes){
-                            printf("Location non-eu: Participant %s numvotes %d\n\n", participante.participantName, participante.numVotes);
+                        cnt_non_eu ++;
+                        if(aux_non_eu.numVotes <= participante.numVotes){
+                            aux_non_eu.numVotes = participante.numVotes;
+                            strcpy(aux_non_eu.participantName, participante.participantName);
                         }
-                        aux = participante.numVotes;
                     }
                     p = nextP(p, jurado.participantList);
+                }
+                if (cnt_eu == 0) {
+                    printf("Location eu: No winner\n");
+                } else {
+                    printf("Location eu: Participant %s numvotes %d\n", aux_eu.participantName, aux_eu.numVotes);
+                    aux_eu.numVotes = 0;
+                    cnt_eu = 0;
+                }
+                if (cnt_non_eu == 0) {
+                    printf("Location non-eu: No winner\n\n");
+                }
+                else {
+                    printf("Location non-eu: Participant %s numvotes %d\n\n", aux_non_eu.participantName, aux_non_eu.numVotes);
+                    aux_non_eu.numVotes = 0;
+                    cnt_non_eu = 0;
                 }
             }
             j = nextJ(j, *J);
