@@ -67,12 +67,17 @@ void create(char *commandNumber, char operacion, char *param1, char *param2, tLi
     printf("%s %c: jury %s totalvoters %s\n", commandNumber, operacion, param1, param2);
 
     q = findItemJ(jurado.juryName, *J);
-    if(insertItemJ(jurado, J) && q == NULLJ){    //puede insertar y el jurado no existe
-        printf("* Create: jury %s totalvoters %s\n", param1, param2);
-        createEmptyListP(&jurado.participantList);
-        q = findItemJ(jurado.juryName, *J);
-        updateItemJ(jurado, q, J);
-    }else{
+    if (q == NULLJ) {
+        if (insertItemJ(jurado, J)) {    //puede insertar y el jurado no existe
+            printf("* Create: jury %s totalvoters %s\n", param1, param2);
+            createEmptyListP(&jurado.participantList);
+            q = findItemJ(jurado.juryName, *J);
+            updateItemJ(jurado, q, J);
+        } else {
+            printf("+ Error: Create not possible\n");
+        }
+    }
+    else {
         printf("+ Error: Create not possible\n");
     }
 }
@@ -198,7 +203,7 @@ void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J) {
         while (j != NULLJ) {
             jurado = getItemJ(j,*J);
             printf("Jury %s\n", jurado.juryName);
-            p = findItemP(param1, jurado.participantList);
+            p = findItemP(param1, jurado.participantList);  //busca en lista de participantes
             if (p != NULLP) {
                 participante = getItemP(p, jurado.participantList);
                 printf("Participant %s disqualified\n\n", participante.participantName);
@@ -216,11 +221,9 @@ void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J) {
 }
 
 void remov(char *commandNumber, char operacion, tListJ *J) {
-    tItemJ jurado;
-    tItemP participante;
-    tPosJ j; tPosP p;
+    tItemJ jurado; tItemJ jurado_aux;
+    tPosJ j;
     int contador_jurados = 0;
-    bool flag = false;
 
     printf("********************\n");
     printf("%s %c: \n", commandNumber, operacion);
@@ -229,22 +232,22 @@ void remov(char *commandNumber, char operacion, tListJ *J) {
         printf("+ Error: Remove not possible\n");
     } else {
         j = firstJ(*J);
-        while (j != NULLJ) {
-            j = firstJ(*J); // Te faltaba esto, saltaba al jurado3 porque el deleteatPosition ya te manda a la siguiente posicion por tanto hacias dos saltos
-            //entonces teniamos que mandar al first arriba del while para que siempre empezara a comprobar desde la primera posicion.
+        while (j <= J->lastPos) {
             jurado = getItemJ(j,*J);
             if (jurado.validVotes == 0) {
                 printf("* Remove: jury %s\n", jurado.juryName);
                 deleteAtPositionJ(j,J);
                 contador_jurados ++;
+            } else {
+                j = nextJ(j, *J);
             }
-            j = nextJ(j, *J);
-            if (contador_jurados == 0) {
-                printf("+ Error: Remove not possible\n");
-            }
+        }
+        if (contador_jurados == 0) {
+            printf("+ Error: Remove not possible\n");
         }
     }
 }
+
 void winners(char *commandNumber, char operacion, tListJ *J){
     tItemJ jurado;
     tItemP participante, participante2;
@@ -260,12 +263,12 @@ void winners(char *commandNumber, char operacion, tListJ *J){
         printf("+ Error: Winners not possible\n");
     }else{
         j = firstJ(*J);
-        while(j != NULLJ){
+        while (j != NULLJ){
             jurado = getItemJ(j, *J);
             printf("Jury %s\n", jurado.juryName);
             if (isEmptyListP(jurado.participantList)) {
                 printf("Location eu: No winner\n");
-                printf("Location non-eu: No winner\n");
+                printf("Location non-eu: No winner\n\n");
             } else {
                 p = firstP(jurado.participantList);
                 while (p != NULLP) {
@@ -277,7 +280,7 @@ void winners(char *commandNumber, char operacion, tListJ *J){
                         aux1 = participante.numVotes;
                     }else{
                         if(aux < participante.numVotes){
-                            printf("Location non-eu: Participant %s numvotes %d\n", participante.participantName, participante.numVotes);
+                            printf("Location non-eu: Participant %s numvotes %d\n\n", participante.participantName, participante.numVotes);
                         }
                         aux = participante.numVotes;
                     }
