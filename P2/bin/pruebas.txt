@@ -1,0 +1,37 @@
+01 C Jury1 10
+02 C Jury2 10
+03 C Jury3 10
+04 C Jury4 10
+05 C Jury1 5
+06 S
+07 N Jury1 participant1 eu
+08 N Jury1 participant2 non-eu
+09 N Jury1 participant3 eu
+10 N Jury1 participant4 eu
+11 N Jury2 participant1 eu
+12 N Jury2 participant3 eu
+13 N Jury3 participant2 non-eu
+14 N Jury3 participant4 non-eu
+15 N Jury4 participant3 eu
+16 N Jury4 participant5 non-eu
+17 S
+18 V Jury1 participant1
+19 V Jury1 participant1
+20 V Jury1 participant2
+21 V Jury1 participant4
+22 V Jury1 participant4
+23 V Jury1 participant4
+24 V Jury2 participant1
+25 V Jury2 participant1
+26 V Jury2 participant3
+27 V Jury3 participant2
+28 V Jury3 participant4
+29 V Jury3 participant4
+30 S
+32 D participant1
+33 S
+34 V Jury4 participant3
+35 S
+36 R
+37 S
+38 W
