@@ -4,7 +4,7 @@
  * AUTHOR 1: DIEGO FERNÁNDEZ GÓMEZ LOGIN 1: diego.fgomez
  * AUTHOR 2: DIEGO GONZÁLEZ GONZÁLEZ LOGIN 2: diego.gonzalez7
  * GROUP: 4.2
- * DATE: ** / ** / **
+ * DATE: 21 / 04 / 23
  */
 
 #include <stdio.h>
@@ -16,15 +16,66 @@
 
 #define MAX_BUFFER 255
 
+//FUNCIONES AUXILIARES
+tItemJ inicializarJurado (char *param1, char *param2);
+tItemP inicializarParticipante (char *param1, char *param2);
+bool european (char *param1);
+char* euro (tItemP participante, char *EU);
+
+
 //PRIMERA ENTREGA
+
 void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J);
+/*  OBJETIVO: Añadir un nuevo jurado a la lista de jurados, con sus votos puestos a 0, además de inicializar su lista de participantes.
+ *  ENTRADA: Recibe un número de comando, un comando (C), una lista de jurados, JuryName [NAME_LENGTH_LIMIT] y los votantes de dicho jurado.
+ *  SALIDA: La lista de jurados con el nuevo jurado añadido en caso de que se pudiese realizar la operación.
+ *  PRECONDICIÓN: La lista de jurados ha sido creada previamente.
+ *  POST-CONDICIONES: Cada jurado deberá tener una lista de participantes vacía, además de que las posiciones de la lista de jurados han podido cambiar.
+ */
 void new(char *commandNumber, char operacion, char *param1, char *param2, char *param3, tListJ *J);
+/*  OBJETIVO: Añadir un nuevo participante a la lista de participantes del jurado correspondiente con sus votos puestos a 0.
+ *  ENTRADA: Recibe un número de comando, un comando (N), una lista de jurados, JuryName [NAME_LENGTH_LIMIT], participantName [NAME_LENGTH_LIMIT] y si es europeo o no.
+ *  SALIDA: La lista de participantes del jurado con el nuevo participante en caso de que se haya podido realizar la operación.
+ *  PRECONDICIÓN: La lista de participantes del jurado ha sido previamente creada.
+ *  POST-CONDICIONES: Las posiciones en la lista de participantes han podido cambiar.
+ */
 void vote(char* commandNumber, char operacion, char *param1, char* param2, tListJ *J);
+/*  OBJETIVO: Efectuar un voto para un participante de un jurado.
+ *  ENTRADA: Recibe un número de comando, un comando (V), una lista de jurados, JuryName [NAME_LENGTH_LIMIT] y participantName [NAME_LENGTH_LIMIT].
+ *  SALIDA: La lista de participantes del jurado concreto, y dicho participante con 1 voto más en caso de que se haya podido realizar el voto,
+ *          en caso contrario los votos nulos del jurado deberán incrementarse.
+ *  PRECONDICIÓN: La lista de jurados ha sido previamente creada e inicializada.
+ *  POST-CONDICIONES: Los votos del jurado y del participante (en caso de existir) deberán verse modificados.
+ */
 void stats(char *commandNumber, char operacion, tListJ *J);
+/*  OBJETIVO: Mostrar información relevante sobre la votación.
+ *  ENTRADA: Recibe un número de comando, un comando (S), una lista de jurados.
+ *  SALIDA: Una lista con toda la información de los jurados existentes y sus respectivos participantes, además de unas estadísticas con los votos.
+ */
+
 //SEGUNDA ENTREGA
+
 void disqualify (char *commandNumber, char operacion, char *param1, tListJ *J);
+/*  OBJETIVO: Descalificar a un participante de la lista de participantes de todos los jurados en los que aparezca.
+ *  ENTRADA: Recibe un número de comando, un comando (D), una lista de jurados y un participantName [NAME_LENGTH_LIMIT].
+ *  SALIDA: La lista de jurados sin el participante descalificado en todas las listas de participantes donde aparezca.
+ *  PRECONDICIÓN: La lista de jurados ha sido previamente creada e inicializada.
+ *  POST-CONDICIONES: Los votos nulos pueden ser modificados y las posiciones de la lista de participantes han podido cambiar.
+ */
 void remov(char *commandNumber, char operacion, tListJ *J);
+/*  OBJETIVO: Eliminar todos los jurados sin votos válidos.
+ *  ENTRADA: Recibe un número de comando, un comando (R) y una lista de jurados.
+ *  SALIDA: La lista de jurados sin los jurados eliminados (los que no tenían votos válidos).
+ *  PRECONDICIÓN: La lista de jurados ha sido previamente creada e inicializada.
+ *  POST-CONDICIONES: Las posiciones en la lista de jurados han podido cambiar.
+ */
 void winners(char *commandNumber, char operacion, tListJ *J);
+/*  OBJETIVO: Mostrar los participantes con más votos de cada jurado europeos y no europeos (en caso de empate o no existencia de participantes no habrá ganador).
+ *  ENTRADA: Recibe un número de comando, un comando (W) y una lista de jurados.
+ *  SALIDA: Los participantes ganadores.
+ *  PRECONDICIÓN: La lista de jurados ha sido previamente creada e inicializada.
+ *  POST-CONDICIONES: -.
+ */
 
 void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
 
@@ -58,10 +109,7 @@ void processCommand(char *commandNumber, char command, char *param1, char *param
 void create(char *commandNumber, char operacion, char *param1, char *param2, tListJ *J){
     tItemJ jurado;
     tPosJ q;
-    strcpy(jurado.juryName, param1);
-    jurado.totalVoters = atoi(param2);
-    jurado.nullVotes = 0;
-    jurado.validVotes = 0;
+    jurado = inicializarJurado(param1, param2);
 
     printf("********************\n");
     printf("%s %c: jury %s totalvoters %s\n", commandNumber, operacion, param1, param2);
@@ -88,13 +136,7 @@ void new(char *commandNumber, char operacion, char *param1, char *param2, char *
     tItemP participante;
     tPosP p; tPosJ j;
 
-    //asignación de valores para el participante que se va a insertar
-    participante.numVotes = 0;
-    strcpy(participante.participantName, param2);
-    if (strcmp(param3, "eu") != 0) {
-        participante.EUParticipant = true;
-    } else participante.EUParticipant = false;
-
+    participante = inicializarParticipante(param2, param3);
 
     printf("********************\n");
     printf("%s %c: jury %s participant %s location %s\n", commandNumber, operacion, param1, param2, param3);
@@ -120,7 +162,7 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
     tItemJ jurado;
     tItemP participante;
     tPosJ j; tPosP p;
-    char *EU;
+    char *EU = NULL;
 
     printf("********************\n");
     printf("%s %c: jury %s participant %s\n", commandNumber, operacion, param1, param2);
@@ -136,11 +178,11 @@ void vote(char *commandNumber, char operacion, char *param1, char* param2, tList
             jurado.nullVotes++;
             updateItemJ(jurado, j, J);
             //printf("Los votos nulos del %s son %d, y los validos son %d\n", jurado.juryName, jurado.nullVotes, jurado.validVotes);
-        } else {
+        } else {                            //participante encontrado
             participante = getItemP(p, jurado.participantList);
             jurado.validVotes++;
             participante.numVotes++;
-            if (!participante.EUParticipant) EU = "eu"; else EU = "non-eu";
+            EU = euro(participante, EU);
             printf("* Vote: jury %s participant %s location %s numvotes %d\n", jurado.juryName,
                    participante.participantName, EU, participante.numVotes);
             updateItemP(participante, p, &jurado.participantList);
@@ -173,7 +215,7 @@ void stats(char *commandNumber, char operacion, tListJ *J) {
                 p = firstP(jurado.participantList);
                 while (p != NULLP) {
                     participante = getItemP(p, jurado.participantList);
-                    if (!participante.EUParticipant) EU = "eu"; else EU = "non-eu";
+                    EU = euro(participante, EU);
                     printf("Participant %s location %s numvotes %d ", participante.participantName, EU,
                            participante.numVotes);
                     if (jurado.validVotes == 0) {
@@ -281,7 +323,7 @@ void winners(char *commandNumber, char operacion, tListJ *J){
                 p = firstP(jurado.participantList);
                 while (p != NULLP) {
                     participante = getItemP(p, jurado.participantList);
-                    if(!participante.EUParticipant){    //europeo
+                    if(participante.EUParticipant){    //europeo
                         cnt_eu ++;  //contador para ver si hay participantes europeos
                         if (cnt_eu > 1) {   //contador para que compruebe si hay empate en el número de votos máximo
                             if (aux_eu.numVotes == participante.numVotes) {
@@ -333,6 +375,41 @@ void winners(char *commandNumber, char operacion, tListJ *J){
     }
 }
 
+//FUNCIONES AUXILIARES
+
+//Asigna los valores a un jurado
+tItemJ inicializarJurado (char *param1, char *param2) {
+    tItemJ auxiliar;
+    strcpy(auxiliar.juryName, param1);
+    auxiliar.totalVoters = atoi(param2);
+    auxiliar.nullVotes = 0;
+    auxiliar.validVotes = 0;
+
+    return auxiliar;
+}
+//Asigna los valores a un participante
+tItemP inicializarParticipante (char *param1, char *param2) {
+    tItemP participante;
+    participante.numVotes = 0;
+    strcpy(participante.participantName, param1);
+    participante.EUParticipant = european(param2);
+    return participante;
+}
+//Devuelve true si es europeo, false en caso contrario
+bool european (char *param1) {
+    tItemP participante;
+    if (strcmp(param1, "eu") == 0) {
+        participante.EUParticipant = true;
+    } else participante.EUParticipant = false;
+    return participante.EUParticipant;
+}
+//Dependiendo del valor del boolean EUParticipant asigna su string correspondiente.
+char* euro (tItemP participante, char *EU) {
+    if (participante.EUParticipant) EU = "eu"; else EU = "non-eu";
+    return EU;
+}
+
+
 void readTasks(char *filename, tListP *P, tListJ *J) {
 
     FILE *f = NULL;
@@ -372,9 +449,9 @@ int main(int nargs, char **args) {
     if (nargs > 1) {
         file_name = args[1];
     } else {
-        #ifdef INPUT_FILE
+#ifdef INPUT_FILE
         file_name = INPUT_FILE;
-        #endif
+#endif
     }
 
     readTasks(file_name, &P, &J);
