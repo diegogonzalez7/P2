@@ -21,7 +21,9 @@ tItemJ inicializarJurado (char *param1, char *param2);
 tItemP inicializarParticipante (char *param1, char *param2);
 bool european (char *param1);
 char* euro (tItemP participante, char *EU);
-
+void salida(tItemP aux_eu, tItemP aux_non_eu, int cnt_eu, int cnt_non_eu, bool empate_eu, bool empate_non_eu);
+bool cont_euro(tItemP participante, tItemP aux_eu, int cnt_eu, bool empate_eu);
+bool cont_non_euro(tItemP participante, tItemP aux_non_eu, int cnt_non_eu, bool empate_non_eu);
 
 //PRIMERA ENTREGA
 
@@ -77,7 +79,7 @@ void winners(char *commandNumber, char operacion, tListJ *J);
  *  POST-CONDICIONES: -.
  */
 
-void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListP *P, tListJ *J) {
+void processCommand(char *commandNumber, char command, char *param1, char *param2, char *param3, tListJ *J) {
 
     switch (command) {
         case 'C':
@@ -325,22 +327,14 @@ void winners(char *commandNumber, char operacion, tListJ *J){
                     participante = getItemP(p, jurado.participantList);
                     if(participante.EUParticipant){    //europeo
                         cnt_eu ++;  //contador para ver si hay participantes europeos
-                        if (cnt_eu > 1) {   //contador para que compruebe si hay empate en el número de votos máximo
-                            if (aux_eu.numVotes == participante.numVotes) {
-                                empate_eu = true;
-                            }
-                        }
+                        cont_euro(participante, aux_eu, cnt_eu, empate_eu);
                         if(aux_eu.numVotes <= participante.numVotes){   //asigna los datos del participante al aux_eu
                             aux_eu.numVotes = participante.numVotes;
                             strcpy(aux_eu.participantName, participante.participantName);
                         }
                     }else{  //no europeo
                         cnt_non_eu ++;  //contador para ver si hay participantes no europeos
-                        if (cnt_non_eu > 1) {
-                            if (aux_non_eu.numVotes == participante.numVotes) {
-                                empate_non_eu = true;
-                            }
-                        }
+                        cont_non_euro(participante, aux_non_eu, cnt_non_eu, empate_non_eu);
                         if(aux_non_eu.numVotes <= participante.numVotes){   //asigna los datos del participante a aux_non_eu
                             aux_non_eu.numVotes = participante.numVotes;
                             strcpy(aux_non_eu.participantName, participante.participantName);
@@ -348,27 +342,7 @@ void winners(char *commandNumber, char operacion, tListJ *J){
                     }
                     p = nextP(p, jurado.participantList);
                 }
-                if (cnt_eu == 0 || empate_eu) { //no hay participantes europeos o hay empate
-                    printf("Location eu: No winner\n");
-                    cnt_eu = 0;
-                    empate_eu = false;  //es necesario restablecer los valores aquí también
-                } else {
-                    printf("Location eu: Participant %s numvotes %d\n", aux_eu.participantName, aux_eu.numVotes);
-                    aux_eu.numVotes = 0;        //restablece los votos del participante auxiliar y el contador a 0 para pasar al siguiente jurado
-                    cnt_eu = 0;
-                    empate_eu = false;
-                }
-                if (cnt_non_eu == 0 || empate_non_eu) { //no hay participantes no_europeos o hay empate
-                    printf("Location non-eu: No winner\n\n");
-                    cnt_non_eu = 0;
-                    empate_non_eu = false;
-                }
-                else {
-                    printf("Location non-eu: Participant %s numvotes %d\n\n", aux_non_eu.participantName, aux_non_eu.numVotes);
-                    aux_non_eu.numVotes = 0;
-                    cnt_non_eu = 0;
-                    empate_non_eu = false;
-                }
+                salida(aux_eu, aux_non_eu, cnt_eu, cnt_non_eu, empate_eu, empate_non_eu);
             }
             j = nextJ(j, *J);
         }
@@ -409,8 +383,51 @@ char* euro (tItemP participante, char *EU) {
     return EU;
 }
 
+void salida(tItemP aux_eu, tItemP aux_non_eu, int cnt_eu, int cnt_non_eu, bool empate_eu, bool empate_non_eu){
+    if (cnt_eu == 0 || empate_eu) { //no hay participantes europeos o hay empate
+        printf("Location eu: No winner\n");
+        cnt_eu = 0;
+        empate_eu = false;  //es necesario restablecer los valores aquí también
+    } else {
+        printf("Location eu: Participant %s numvotes %d\n", aux_eu.participantName, aux_eu.numVotes);
+        aux_eu.numVotes = 0;        //restablece los votos del participante auxiliar y el contador a 0 para pasar al siguiente jurado
+        cnt_eu = 0;
+        empate_eu = false;
+    }
+    if (cnt_non_eu == 0 || empate_non_eu) { //no hay participantes no_europeos o hay empate
+        printf("Location non-eu: No winner\n\n");
+        cnt_non_eu = 0;
+        empate_non_eu = false;
+    }
+    else {
+        printf("Location non-eu: Participant %s numvotes %d\n\n", aux_non_eu.participantName, aux_non_eu.numVotes);
+        aux_non_eu.numVotes = 0;
+        cnt_non_eu = 0;
+        empate_non_eu = false;
+    }
+}
 
-void readTasks(char *filename, tListP *P, tListJ *J) {
+//contador para que compruebe si hay empate en el número de votos máximo
+bool cont_euro(tItemP participante, tItemP aux_eu, int cnt_eu, bool empate_eu){
+    if (cnt_eu > 1) {
+        if (aux_eu.numVotes == participante.numVotes) {
+              empate_eu = true;
+        }
+    }
+    return empate_eu;
+}
+
+//contador para que compruebe si hay empate en el número de votos máximo
+bool cont_non_euro(tItemP participante, tItemP aux_non_eu, int cnt_non_eu, bool empate_non_eu){
+    if (cnt_non_eu > 1) {
+        if (aux_non_eu.numVotes == participante.numVotes) {
+            empate_non_eu = true;
+        }
+    }
+    return empate_non_eu;
+}
+
+void readTasks(char *filename, tListJ *J) {
 
     FILE *f = NULL;
     char *commandNumber, *command, *param1, *param2, *param3;
@@ -428,7 +445,7 @@ void readTasks(char *filename, tListP *P, tListJ *J) {
             param2 = strtok(NULL, delimiters);
             param3 = strtok(NULL, delimiters);
 
-            processCommand(commandNumber, command[0], param1, param2, param3, P, J);
+            processCommand(commandNumber, command[0], param1, param2, param3, J);
         }
 
         fclose(f);
@@ -454,7 +471,7 @@ int main(int nargs, char **args) {
 #endif
     }
 
-    readTasks(file_name, &P, &J);
+    readTasks(file_name, &J);
 
     return 0;
 }
